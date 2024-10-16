@@ -1,0 +1,242 @@
+.custom-container {
+	color: black;
+}
+
+.fields-container {
+	display: flex;
+	flex-wrap: wrap;
+	/* Ensure fields wrap to new rows */
+	/*gap: 1rem;  Space between fields */
+}
+
+.field-item {
+	width: calc(20% - 1rem);
+	/* Adjust width and spacing */
+	box-sizing: border-box;
+}
+
+.field-item a {
+	text-decoration: none;
+	color: #0070d2;
+}
+
+.result-status {
+	float: right;
+	margin-top: -42px;
+	margin-right: 17px;
+}
+
+.crediantials-combobox {
+	display: flex;
+	margin-top: -17px;
+	/*justify-content: flex-end;
+    margin-top: -55px;
+    margin-right: 133px;*/
+}
+
+.helptext {
+	margin-top: 11px;
+	padding: 3px;
+}
+
+.area {
+	background-color: #F8F8F8;
+	padding: 3px;
+	border-radius: 5px;
+	border: 1px solid #E0E3E5;
+}
+
+.action-arrow {
+	text-align: center;
+}
+
+.arrow-body {
+	background-color: rgb(13, 152, 211);
+	width: 118px;
+	margin: 0 auto;
+	padding-top: 7px;
+	margin-top: -16px;
+}
+
+.arrow-head {
+	border-left: 60px solid transparent;
+	border-right: 60px solid transparent;
+	border-top: 20px solid rgb(13, 152, 211);
+	width: 0;
+	margin: 0 auto -8px;
+	position: relative;
+}
+
+.button {
+	color: #0000;
+	margin-top: 10px;
+	padding-right: 6px;
+}
+
+.SavesQuerycontainer{
+	text-align: center;
+	padding-left: 406px;
+	padding-top: 1px;
+}
+.SavesQuerybutton{
+	margin: 0 auto;
+	margin-top: -45px;
+}
+.area2 {
+	background-color: #F8F8F8;
+	padding: 3px;
+	border-radius: 5px;
+	border: 1px solid #E0E3E5;
+	border-top: 3px solid #1797C0;
+}
+
+.result-bar {
+	margin-bottom: 3px;
+}
+
+.table-buttons {
+	margin-top: 20px;
+}
+
+.slds-box.box {
+	width: 500px;
+	height: auto;
+	margin: 8px auto;
+	padding: 20px;
+	background-color: #f4f6f9;
+	border-radius: 10px;
+}
+
+.centered-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.date-container {
+	margin-top: 20px;
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.date-container lightning-input {
+	width: 30%;
+}
+
+.input-container {
+	margin-top: 20px;
+	width: 100%;
+	display: flex;
+	justify-content: end;
+}
+
+.input-container lightning-combobox {
+	margin-left: 20px;
+	/* Add space between comboboxes */
+}
+
+.details-container {
+	margin-top: 20px;
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.details-container lightning-input {
+	width: 30%;
+}
+
+.email-container {
+	width: 100%;
+	justify-content: space-evenly;
+}
+
+.email-container lightning-input {
+	width: 30%;
+}
+
+.email-container2 {
+	width: 100%;
+	display: flex;
+	/* Change to flex for better alignment */
+	flex-direction: column;
+	/* Ensure items stack vertically */
+}
+
+.email-container2 lightning-textarea {
+	width: 100%;
+	/* Make textarea full width */
+	margin-top: 10px;
+	/* Add some spacing if needed */
+}
+
+.crediantials-combobox2 {
+	display: flex;
+	/*flex-direction: column;  Stack help text and textarea */
+}
+
+.helptext2 {
+	margin-top: 4px;
+	padding: 3px;
+}
+
+.step-names {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 10px;
+	/* Space between progress indicator and step names */
+}
+
+.step-names span {
+	flex: 1;
+	font-size: 17px;
+	font-weight: 600;
+	color: #555;
+	margin-left: 106px;
+}
+
+.step-names2 {
+	display: flex;
+	justify-content: end;
+	margin-top: -4px;
+	margin-right: 98px;
+}
+
+.step-names2 span {
+	flex: 1;
+	text-align: center;
+	color: #555;
+}
+.backgroundInverse {
+    background-color: #e2e2e267;
+	display: flex;
+}
+.Container {
+    top: 24%;
+    left: 0%;
+    bottom: 24%;
+}
+.slds-combobox_container {
+	background-color: rgb(243, 243, 243);
+}
+.slds-modal__header {
+	background-color: rgb(243, 243, 243);
+}
+.slds-card__body {
+    border-top-style: groove;
+    border-top-color: rgb(243, 243, 243);
+}
+.grid {
+	border-top-color: rgb(243, 243, 243);
+}
+.radio{
+	display: contents;
+}
+th.slds-table__header-cell {
+    text-align: center;
+}
+
+td.slds-table__cell {
+    text-align: center;
+}

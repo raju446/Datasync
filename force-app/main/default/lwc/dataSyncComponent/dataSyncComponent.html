@@ -1,0 +1,483 @@
+<template>
+  <lightning-card title="Data Sync Component" icon-name="standard:product_transfer">
+  <div if:true={isLoading}>
+      <lightning-spinner alternative-text="Loading query results..." size="small" variant="Brand"></lightning-spinner>
+  </div>
+    <div class="slds-m-around_medium area">
+      <lightning-combobox 
+        label="Select Object" 
+        value={selectedObject} 
+        options={objects} 
+        onchange={handleObjectChange}>
+      </lightning-combobox>
+      <lightning-textarea 
+        label="SOQL Query"
+        placeholder="Enter Query..." 
+        value={query} 
+        onchange={handleQueryChange} 
+        disabled={isdisable}>
+      </lightning-textarea>
+      <template if:true={isFieldsLoading}>
+        <lightning-spinner alternative-text="Loading fields..." size="small" variant="Brand"></lightning-spinner>
+      </template>
+
+      <template if:true={showfields}>
+        <div class="slds-m-top_medium">
+          <h3>Available Fields</h3>
+          <div class="fields-container">
+            <template for:each={visibleFields} for:item="field">
+              <div key={field} class="field-item">
+                <a data-field={field} onclick={handleFieldClick}> {field} </a>
+              </div>
+            </template>
+          </div>
+          <template if:true={showMoreButton}>
+            <lightning-button 
+              label="Show More" 
+              onclick={handleShowMore} 
+              variant="base" 
+              class="slds-m-top_small">
+            </lightning-button>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    <div class="action-arrow">
+      <div class="arrow-body">
+        <lightning-button 
+          label="Execute" 
+          title="Execute Query"
+          icon-name="utility:search" 
+          onclick={handleExecuteQuery} 
+          class="slds-m-left_x-small button" 
+          disabled={isexecute}>
+        </lightning-button>
+      </div>
+      <div class="arrow-head"></div>
+    </div>
+    <div class="SavesQuerycontainer">
+      <div class="SavesQuerybutton">
+        <lightning-button-group>
+            <lightning-button label="Save Query" icon-name="utility:save" onclick={handleSaveQuery} disabled={isexecute}></lightning-button>
+            <lightning-button label="Select SOQL" icon-name="utility:choice" onclick={handleSelectSoql} disabled={isdisable}></lightning-button>
+        </lightning-button-group>
+        <!--<lightning-button
+            label = "Save Query"
+            title = "Saves Query"
+            onclick={handleSaveQuery}
+            class="slds-m-left_x-small button" 
+            disabled={isexecute}>
+        </lightning-button>-->
+      </div>
+    </div>
+    <!--<div class="selectQuerycontainer">
+      <div class="selectQuerybutton">
+        <lightning-button
+            label = "Select SOQL"
+            title = "Select SOQL"
+            onclick={handleSelectSoql}
+            class="slds-m-left_x-small button"
+             disabled={isdisable}>
+        </lightning-button>
+      </div>
+    </div>-->
+    <span class="result-status" if:true={queryResults.length}>Exported {queryResults.length} record(s).</span>
+
+    <div class="area2" id="result-area">
+      <div class="result-bar">
+        <div class="slds-m-around_medium area" if:true={externalIdFields.length}>
+         <div class="demo-only--sizing slds-grid slds-wrap">
+          <div class="slds-col slds-size_1-of-2 slds-p-horizontal_small">
+              <template if:true={externalIdFields.length}>
+                  <lightning-combobox 
+                      label="Source Key Field" 
+                      value={sourceField} 
+                      options={externalIdFields} 
+                      onchange={handleFieldChange}>
+                  </lightning-combobox>
+              </template>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-p-horizontal_small">
+              <template if:true={externalIdFields.length}>
+                  <lightning-combobox
+                      label="Target Key Field" 
+                      value={targetField} 
+                      options={tragerextIdFields} 
+                      onchange={handletargetFieldChange}>
+                  </lightning-combobox>
+              </template>
+          </div>
+        </div>
+        <span class="crediantials-combobox" if:true={queryResults.length}>
+          <lightning-helptext class="helptext" icon-name="utility:salesforce1" content="Please select which sandbox you want to send the data below."></lightning-helptext>
+          <lightning-combobox 
+            class="slds-size_1-of-5" 
+            placeholder="Select an Org" 
+            value={selectedcredentialsValue} 
+            options={credentialsoptions} 
+            onchange={handleCredentialsChange} 
+            disabled={isorgselection}>
+          </lightning-combobox>
+
+          <span class="table-buttons">
+            <lightning-button if:true={isvisible} variant="brand-outline" label="Sync" onclick={openemaolmodel} class="slds-m-left_x-small"></lightning-button>
+            <lightning-button if:true={isvisible} variant="brand-outline" label="Schedule" onclick={handleSchedule} class="slds-m-left_x-small"></lightning-button>
+          </span>
+            <span class="radio" if:true={isvisible}>
+              <div style="margin-left:1%; margin-top: 28px;">
+                  <template for:each={syncOptions} for:item="item">
+                      <fieldset key={item.value} style="display: block; float: left;">
+                          <div class="slds-form-element__control">
+                              <lightning-input 
+                                  name="radiogroup" 
+                                  id={item.value} 
+                                  type="radio" 
+                                  value={item.value} 
+                                  label={item.label} 
+                                  onchange={handleSelected} 
+                                  required={isrequired}>
+                              </lightning-input>
+                          </div>
+                      </fieldset>
+                  </template>
+              </div>
+          </span>
+          <span style="display: contents;">
+            <lightning-input if:true={isvisible} type="checkbox" label="All & N/A" value={isCheck} onclick={handleChecked} class="slds-m-left_x-small" style="margin-left:1%; margin-top: 28px;"></lightning-input>
+          </span>
+        </span>
+        </div>
+        <template if:true={queryResults.length}>
+          <div class="slds-m-top_medium">
+            <lightning-datatable 
+              key-field="Id" 
+              data={queryResults} 
+              columns={columns} 
+              hide-checkbox-column>
+            </lightning-datatable>
+          </div>
+        </template>
+      </div>
+    </div>
+    <template if:true={showSavedQueries}>
+      <div class="demo-only demo-only_viewport">
+          <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="id-of-modalheader-h1" class="slds-modal slds-fade-in-open slds-modal_medium slds-list-builder" style="height: 80%;">
+            <div class="slds-modal__container">
+              <button class="slds-button slds-button_icon slds-modal__close" title="Cancel and close" onclick={handleclose}>
+                <lightning-icon icon-name="utility:close" alternative-text="Close" size="small"></lightning-icon>
+                <span class="slds-assistive-text">Cancel and close</span>
+              </button>
+              <div class="slds-modal__header">
+                <h1 id="id-of-modalheader-h1" class="slds-text-heading_medium">Manage Saved Queries</h1>
+                <p class="slds-m-top_x-small">Select | Edit | Delete | Download</p>
+              </div>
+              <div class="slds-modal__content slds-grid slds-grow" id="modal-content-id-4">
+                <div class="grid slds-grid slds-grid_vertical">
+                  <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                      <div class="slds-combobox_container">
+                        <div class="slds-card__header slds-grid"  if:true={showqueryBanks}>
+                          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <lightning-icon icon-name="standard:entity" alternative-text="Entity Icon" size="small"></lightning-icon>
+                                <span> Query Bank Records ({queryBanks.length})</span>
+                            </h2>
+                            </div>
+                            <div class="slds-no-flex">
+                              <lightning-button-group>
+                                <lightning-button-icon icon-name="utility:delete" variant="border-filled" alternative-text="Delete" title="Delete" onclick={handleDeleteSelected} disabled={isDeleteButtonDisabled}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:download" variant="border-filled" alternative-text="Download" title="Download" onclick={handleDownload}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:refresh" variant="border-filled" alternative-text="Refresh" title="Refresh" onclick={handleRefresh}></lightning-button-icon>
+                              </lightning-button-group>
+                            </div>
+                          </header>
+                        </div>
+                        <div class="slds-card__body">
+                          <div if:true={isQueryLoading}>
+                            <lightning-spinner alternative-text="Loading query results..." size="small" variant="Brand"></lightning-spinner>
+                          </div>
+                          <template if:true={showqueryBanks}>
+                            <lightning-datatable
+                              key-field="Id"
+                              data={queryBanks}
+                              columns={savequerycolumns}
+                              show-row-number-column
+                              onrowaction={handleRowAction}
+                              onrowselection={handleSelectAll}
+                              onsave={handlInlineeSave}
+                              draft-values={draftValues}
+                              min-column-width="80"
+                              aria-label="Query Bank Records Table">
+                            </lightning-datatable>
+                          </template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <template if:false={showqueryBanks}>
+                  <div class="slds-text-color_error slds-align_absolute-center">
+                  <p class="slds-text-align_center">No records found.</p>
+                  </div>
+                </template>
+              </div>
+              <div class="slds-modal__footer">
+                <lightning-button class="slds-button_neutral" icon-name="utility:close" label="Cancel" onclick={handleclose}></lightning-button>
+              </div>
+            </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </div>
+      </template> <!--Query export model-->
+          <template if:true={isModalOpen}>
+          <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+              <div class="slds-modal__container">
+                  <div class="slds-modal__header">
+                      <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                          <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                          <span class="slds-assistive-text">Close</span>
+                      </button>
+                      <h2 class="slds-text-heading_medium">Download Status</h2>
+                  </div>
+                  <div class="slds-modal__content slds-p-around_medium">
+                      <p><strong>Job ID:</strong> {jobId}</p>
+                      <p><strong>Job Status:</strong> {jobStatus}</p>
+                      <p><strong>Number of Records Processed:</strong> {recordsProcessed}</p>
+                      <p><strong>Number of Records Retrieved:</strong> {recordsRetrieved}</p>
+                  </div>
+                  <div class="slds-modal__footer">
+                      <lightning-button variant="neutral" label="Close" onclick={closeModal}></lightning-button>
+                  </div>
+              </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+      </template>
+    <template if:true={isModalVisible}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_medium">
+        <div class="slds-modal__container">
+          <lightning-button-icon 
+            icon-name="utility:close" 
+            variant="border-filled" 
+            alternative-text="close" 
+            title="close" 
+            class="slds-button slds-button_icon slds-button_icon-border-filled slds-modal__close" 
+            onclick={handleCancel}>
+          </lightning-button-icon>
+
+          <div class="slds-modal__header">
+            <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate" tabindex="-1">Schedule</h1>
+          </div>
+
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <template if:true={isSchduleLoading}>
+              <div class="backgroundInverse">
+                  <lightning-spinner alternative-text="Loading query results..." size="small" variant="Brand" class="Container slds-spinner_container"></lightning-spinner>
+              </div>
+            </template>
+            <lightning-input 
+              type="text" 
+              label="Job Name" 
+              title="Jobname" 
+              placeholder="Please Enter JobName..." 
+              value={jobName} 
+              onchange={handleJobName} 
+              required>
+            </lightning-input>
+
+            <!--<div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_4-of-12">Schedule Using</div>
+                <div class="slds-col slds-size_4-of-12">
+                    <lightning-input 
+                    type="radio" 
+                    label="Schedule Builder" 
+                    title="Schedule" 
+                    checked={scheduleJob} 
+                    onchange={handleScheduleJob} 
+                    required>
+                    </lightning-input>
+              </div>
+              <div class="slds-col slds-size_4-of-12">
+                    <lightning-input 
+                    type="radio" 
+                    label="Cron Expression" 
+                    title="Cron" 
+                    checked={cronJob} 
+                    onchange={handleCronExpression} 
+                    required>
+                    </lightning-input>
+              </div>-->
+              
+                <div class="slds-box box">
+                    <div class="centered-container">
+                      <div class="details-container">
+                        <lightning-radio-group 
+                            name="Frequency"
+                            label="Frequency"
+                            options={frequencyoptions}
+                            value={frequencyvalue}
+                            onchange={handlefrequency}
+                            type="radio"
+                            required>
+                        </lightning-radio-group>
+                        <lightning-textarea 
+                              label="Email"
+                              placeholder="Enter Valid Emails..." 
+                              value={toemails} 
+                              onchange={handletoemailsChange}
+                              required>
+                          </lightning-textarea>
+                        </div>
+                        <div class="input-container" if:true={isweekly}>
+                            <lightning-checkbox-group 
+                                name="Recurs every week on" 
+                                label="Recurs every week on" 
+                                options={everyweekoptions} 
+                                value={everyweekvalue}
+                                onchange={handleeveryweek} 
+                                required>
+                            </lightning-checkbox-group>
+                        </div>
+
+                        <div class="input-container" if:true={ismonthly}>
+                            <lightning-combobox 
+                                label="Month Of Week" 
+                                name="Month of Week" 
+                                value={monthofweekvalue} 
+                                options={monthofweekOptions} 
+                                onchange={handlemonthofweekChange}>
+                            </lightning-combobox>
+                            <lightning-combobox 
+                                name="Month Of Day" 
+                                label="Month Of Day" 
+                                options={monthofdayoptions} 
+                                value={monthofdayvalue}
+                                onchange={handlemonthofday}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="date-container">
+                            <lightning-input type="date" name="input1" label="Start" value={startdate} onchange={handleInputChange} if:true={showStartdate} required></lightning-input>
+                            <lightning-input type="date" name="input2" label="Stop" value={stopdate} onchange={handleInputChange} if:true={showStopdate} required></lightning-input>
+                            <lightning-input type="time" name="input3" label="Preferred Start Time" value={time} onchange={handleInputChange} required></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal__footer">
+              <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={handleCancel}>Cancel</button>
+              <button class="slds-button slds-button_brand" onclick={openScheduleProcess}>Proceed</button>
+            </div>
+          </div>
+        </div>
+      </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+    <template if:true={isSyncVisible}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02" class="slds-modal slds-fade-in-open slds-modal_medium">
+        <div class="slds-modal__container">
+          <lightning-button-icon 
+            icon-name="utility:close" 
+            variant="border-filled" 
+            alternative-text="close" 
+            title="close" 
+            class="slds-button slds-button_icon slds-button_icon-border-filled slds-modal__close" 
+            onclick={handleCancel}>
+          </lightning-button-icon>
+
+          <div class="slds-modal__header">
+            <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate" tabindex="-1">{headerlabel}</h1>
+          </div>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+            <template if:true={isSyncLoading}>
+              <div class="backgroundInverse">
+                  <lightning-spinner alternative-text="Loading query results..." size="small" variant="Brand" class="Container slds-spinner_container"></lightning-spinner>
+              </div>
+            </template>
+                <lightning-input 
+                    if:true={isSyncprocess}
+                    type="text" 
+                    label="Sync Job Name" 
+                    title="Jobname" 
+                    placeholder="Please Enter JobName..." 
+                    value={syncJobName} 
+                    onchange={handleSyncJobName} 
+                    required>
+                </lightning-input>
+                <div class="slds-box box" if:true={isSyncprocess}>
+                    <div class="centered-container">
+                      <div class="email-container2">
+                        <span class="crediantials-combobox2">
+                        <lightning-helptext class="helptext2" icon-name="utility:salesforce1" content="Please enter valid email addresses separated by commas."></lightning-helptext>
+                        <lightning-textarea 
+                              label="Email"
+                              placeholder="Enter Valid Emails..." 
+                              value={toemailstosync} 
+                              onchange={handletoemailssyncChange}
+                              required>
+                          </lightning-textarea>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+              <template if:true={batchInitiateionProcess}>
+              <lightning-progress-indicator current-step={currentStep} type="base" has-error={hasError} variant="shade">
+                  <lightning-progress-step label="Sync Initiation is in Progress" value="1" onclick={handleStep1}></lightning-progress-step>
+                  <lightning-progress-step label="Sync Initiation is Complete" value="2" onclick={handleStep2}></lightning-progress-step>
+              </lightning-progress-indicator>
+              <div class="step-names">
+                  <span>Sync Initiation is in Progress</span>
+                  <span class="step-names2">Sync Initiation is Complete</span>
+              </div>
+              </template>
+            </div>
+            <div class="slds-modal__footer">
+              <button class="slds-button slds-button_neutral" onclick={handleCancel} if:true={isSyncprocess}>Cancel</button>
+              <button class="slds-button slds-button_brand" onclick={handleSync} if:true={isSyncprocess}>proceed to Sync</button>
+              <button class="slds-button slds-button_neutral" onclick={handleCancel} if:true={batchInitiateionProcess}>Cancel</button>
+              <button class="slds-button slds-button_brand" onclick={handleSyncViewStatus} if:true={batchInitiateionProcess} disabled={isViewStatus}>View Sync Status</button>
+            </div>
+          </div>
+        </div>
+      </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+    <template if:true={isScheduleVisible}>
+      <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_medium">
+        <div class="slds-modal__container">
+          <lightning-button-icon 
+            icon-name="utility:close" 
+            variant="border-filled" 
+            alternative-text="close" 
+            title="close" 
+            class="slds-button slds-button89_icon slds-button_icon-border-filled slds-modal__close" 
+            onclick={handleCancel}>
+          </lightning-button-icon>
+
+          <div class="slds-modal__header">
+            <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate" tabindex="-1">Schedule Process</h1>
+          </div>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+            <div>
+              <lightning-progress-indicator current-step={currentStep} type="base" has-error={hasError} variant="shade">
+                  <lightning-progress-step label="Schedule Initiation is in Progress" value="3" onclick={handleStep3}></lightning-progress-step>
+                  <lightning-progress-step label="Schedule Initiation is Complete" value="4" onclick={handleStep4}></lightning-progress-step>
+              </lightning-progress-indicator>
+              <div class="step-names">
+                  <span>Schedule Initiation is in Progress</span>
+                  <span class="step-names2">Schedule Initiation is Complete</span>
+              </div>
+              </div>
+            </div>
+            <div class="slds-modal__footer">
+              <button class="slds-button slds-button_neutral" onclick={handleCancel}>Cancel</button>
+              <button class="slds-button slds-button_brand" onclick={handleViewStatus} disabled={isScheduleViewStatus}>View Schedule Status</button>
+            </div>
+          </div>
+        </div>
+      </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+  </lightning-card>
+</template>
